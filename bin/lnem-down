@@ -1,0 +1,46 @@
+#!/bin/bash
+
+NUM_INTERFACES=2
+FIRST_INTERFACE=1
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -n|--num)
+    NUM_INTERFACES="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -o|--offset)
+    FIRST_INTERFACE="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+LAST_INTERFACE=$(( $FIRST_INTERFACE + $NUM_INTERFACES - 1 ))
+echo "Deleting $NUM_INTERFACES network namespaces blue$FIRST_INTERFACE...blue$LAST_INTERFACE"
+
+NUM_INTERFACES=$(($NUM_INTERFACES+1))
+
+for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
+	do			
+		#Delete the virtual ethernet device
+		sudo ip netns exec blue${c} tc qdisc del dev vethvirtual${c} root > /dev/null 2>&1		
+		sudo ip link del vethreal${c}
+		sudo ip netns del blue${c}	 
+		
+	done
+
+
+
+
