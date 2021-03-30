@@ -14,26 +14,25 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
 
 
 ```
-                                               Internet 
-                                                  |                                       
-  _____________________                           |                                _____________________
- |                     |                          |                               |                     |
- |  vethvirtual1       |-------- vethreal1 ----- host ----- vethreal2 ------------|  vethvirtual2       |  
- |  10.240.1.2         |         10.240.1.1       |         10.240.2.1            |  10.240.2.2         |
- |  namespace blue1    |                          |                               |  namespace blue2    |
- |_____________________|                          |                               |_____________________|   
-                                              vethrealN
-											  10.240.N.1  
-                                                  |
-                                                  |  
-                                                  |
-										___________________________ 
-									   |                           |
-									   |  vethvirtualN             |
-									   |  10.240.N.2               |
-									   |  namespace blueN          |
-									   |                           | 
-									   |___________________________|   
+                                          Internet 
+                                             |                                       
+  ___________________                        |                         ___________________
+ |                   |                       |                        |                   |
+ |  vethvirtual1     |----- vethreal1 ----- host ----- vethreal2 -----|  vethvirtual2     |  
+ |  10.240.1.2       |      10.240.1.1       |         10.240.2.1     |  10.240.2.2       |
+ |  namespace blue1  |                       |                        |  namespace blue2  |
+ |___________________|                       |                        |___________________|   
+                                         vethrealN
+										 10.240.N.1  
+                                             |
+                                             |  
+                                             |
+                                     ___________________ 
+                                    |                   |
+                                    |  vethvirtualN     |
+                                    |  10.240.N.2       |
+                                    |  namespace blueN  | 
+                                    |___________________|   
 
 
 ```
