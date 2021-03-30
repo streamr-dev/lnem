@@ -43,7 +43,8 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
 * The following Debian packages (or equivivalent):
 
 ```
-sudo apt-get install iproute
+sudo apt-get install iproute2
+sudo apt-get install net-tools
 ```
 
 ## Installing
