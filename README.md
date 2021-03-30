@@ -49,13 +49,13 @@ sudo apt-get install iproute
 ## Installing
 
 ```
-sudo npm install -g @streamr/lnem
+npm install -g @streamr/lnem
 ```
 
 ## Uninstalling
 
 ```
-sudo npm uninstall -g @streamr/lnem
+npm uninstall -g @streamr/lnem
 ```
 
 ## Usage examples
