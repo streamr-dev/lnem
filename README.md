@@ -37,7 +37,7 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
 
 ```
 
-### Prerequisites
+## Prerequisites
 
 * A Linux host with root privilleges (use a dedicated virtual machine to stay safe)
 * The following Debian packages (or equivivalent):
@@ -45,6 +45,69 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
 ```
 sudo apt-get install iproute
 ```
+
+## Installing
+
+```
+sudo npm install -g @streamr/lnem
+```
+
+## Uninstalling
+
+```
+sudo npm uninstall -g @streamr/lnem
+```
+
+## Usage examples
+
+## Measuring emulated network using ping and netperf
+
+Install netperf 
+
+```
+sudo apt-get install netperf
+```
+
+Create a network namespace for the netperf server with download bandwidth limit of 1000 kbit/s, upload bandwidth limit of 2000 kbit/s, and latency of 10 ms.
+
+```
+sudo lnem-up --download 1000 --upload 2000 --latency 10 --num 1
+```
+
+Create a network namespace for the netperf client with no limits. Notice that we give the offset parameter
+to start creating the network namespaces starting from namespace blue2, since namespace blue1 is already in use by the server.
+
+```
+sudo lnem-up --num 1 --offset 2
+```
+
+Measure the RTT between the blue1 and blue2 etwork namespaces using ping
+
+```
+sudo ip netns exec blue2 ping 10.240.1.2
+```
+
+Start the netperf server in the blue1 namespace
+
+```
+sudo ip netns exec blue1 netserver  &
+```
+
+
+Run the netperf client in the blue2 namespace, and instruct it to connect to the server running in namespace blue2. The result should
+be close to 1 Mibit/s (the download bandwidth limit we set to the server's namespace)
+
+```
+sudo ip netns exec blue2 netperf -H 10.240.1.2 
+```
+
+To clean up, kill netperf server, and delete the two namespaces.
+
+```
+sudo pkill netserver
+sudo lnem-down -n 2
+```
+
 
 ## License
 
