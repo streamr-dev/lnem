@@ -23,7 +23,7 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
  |  namespace blue1  |                       |                        |  namespace blue2  |
  |___________________|                       |                        |___________________|   
                                          vethrealN
-										 10.240.N.1  
+                                         10.240.N.1  
                                              |
                                              |  
                                              |
