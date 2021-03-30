@@ -50,13 +50,13 @@ sudo apt-get install net-tools
 ## Installing
 
 ```
-npm install -g @streamr/lnem
+sudo npm install -g @streamr/lnem
 ```
 
 ## Uninstalling
 
 ```
-npm uninstall -g @streamr/lnem
+sudo npm uninstall -g @streamr/lnem
 ```
 
 ## Usage examples
