@@ -1,0 +1,26 @@
+{
+  "name": "lnem",
+  "version": "1.0.0",
+  "description": "Lightweight Network EMulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streamr-dev/lnem.git"
+  },
+  "keywords": [
+    "network",
+    "emulator",
+    "netem",
+    "bash",
+    "linux"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/streamr-dev/lnem/issues"
+  },
+  "homepage": "https://github.com/streamr-dev/lnem#readme"
+}
