@@ -56,9 +56,9 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 LAST_INTERFACE=$(( $FIRST_INTERFACE + $NUM_INTERFACES - 1 ))
 echo "Creating $NUM_INTERFACES network namespaces blue$FIRST_INTERFACE...blue$LAST_INTERFACE"
-echo "Upload bandwidth limit $ULSPEED kbit/s"
-echo "Download bandwidth $DLSPEED kbit/s"
-echo "One-way latency $ONEWAYDELAY ms"
+echo "Upload to host bandwidth limit $ULSPEED kbit/s"
+echo "Download from host bandwidth limit $DLSPEED kbit/s"
+echo "RTT latency to host $ONEWAYDELAY ms"
 
 
 smallcounter=1

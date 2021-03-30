@@ -1,6 +1,6 @@
 {
   "name": "@streamr/lnem",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight Network EMulator",
   "bin": {
   "lnem-up": "./bin/lnem-up",
