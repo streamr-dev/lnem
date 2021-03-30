@@ -68,7 +68,8 @@ Install netperf
 sudo apt-get install netperf
 ```
 
-Create a network namespace for the netperf server with download bandwidth limit of 1000 kbit/s, upload bandwidth limit of 2000 kbit/s, and latency of 10 ms.
+Create a network namespace for the netperf server with download bandwidth limit of 1000 kbit/s, upload bandwidth limit of 2000 kbit/s, and RTT latency 
+of 10 ms between the namespace and the host machine.
 
 ```
 sudo lnem-up --download 1000 --upload 2000 --latency 10 --num 1
@@ -81,7 +82,7 @@ to start creating the network namespaces starting from namespace blue2, since na
 sudo lnem-up --num 1 --offset 2
 ```
 
-Measure the RTT between the blue1 and blue2 etwork namespaces using ping
+Measure the RTT between the blue1 and blue2 network namespaces using ping
 
 ```
 sudo ip netns exec blue2 ping 10.240.1.2
