@@ -47,6 +47,14 @@ sudo apt-get install iproute2
 sudo apt-get install net-tools
 ```
 
+* Ensure that ipv4 forwarding is enabled (if pings will not go through this is most likely disabled)
+
+```
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+[more info on how to make the ip forwarding change permanent](https://askubuntu.com/questions/311053/how-to-make-ip-forwarding-permanent)
+
 ## Installing
 
 ```
