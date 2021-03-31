@@ -145,7 +145,7 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
                  	
                  	if [ "$DLSPEED" != "0" ]
                   	 then	
-				sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root cake bandwidth ${DLSPEED}kbit besteffortt
+				sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root cake bandwidth ${DLSPEED}kbit besteffort
 			fi
 		fi 	
 		
