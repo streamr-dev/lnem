@@ -51,6 +51,7 @@ sudo apt-get install net-tools
 
 ```
 sudo sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -p /etc/sysctl.conf
 ```
 
 [more info on how to make the ip forwarding change permanent](https://askubuntu.com/questions/311053/how-to-make-ip-forwarding-permanent)
