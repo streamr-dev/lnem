@@ -1,10 +1,12 @@
 {
   "name": "@streamr/lnem",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Lightweight Network EMulator",
   "bin": {
   "lnem-up": "./bin/lnem-up",
-  "lnem-down": "./bin/lnem-down"
+  "lnem-down": "./bin/lnem-down",
+  "lnem-create-nat": "./bin/lnem-create-nat",
+  "lnem-delete-nat": "./bin/lnem-delete-nat"
   },
   "main": "",
   "scripts": {
