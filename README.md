@@ -70,6 +70,23 @@ sudo npm install -g @streamr/lnem
 sudo npm uninstall -g @streamr/lnem
 ```
 
+## Connecting the emulated network to Internet through NAT
+
+If you wish your emulated network to be able to connect to the Internet, you
+can set uo NAT using the script: 
+
+```
+sudo lnem-create-nat
+```
+
+## Disconnecting the emulated network from Internet
+
+The NAT can be deleted using the script:
+
+```
+sudo lnem-delete-nat
+```
+
 ## Usage examples
 
 ## Measuring emulated network using ping and netperf
