@@ -58,7 +58,7 @@ LAST_INTERFACE=$(( $FIRST_INTERFACE + $NUM_INTERFACES - 1 ))
 echo "Creating $NUM_INTERFACES network namespaces blue$FIRST_INTERFACE...blue$LAST_INTERFACE"
 echo "Upload to host bandwidth limit $ULSPEED kbit/s"
 echo "Download from host bandwidth limit $DLSPEED kbit/s"
-echo "RTT latency to host $ONEWAYDELAY ms"
+echo "One-way latency to/from host $ONEWAYDELAY ms"
 
 
 smallcounter=1
@@ -107,54 +107,56 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
 
 		#Set upload and download limits to vethvirtualX
 
-		if [[ "$DLSPEED" != "0" || "$ULSPEED" != "0" ]];
-		 then
-		 	sudo tc qdisc add dev vethreal${c} root handle 1: htb default 30
-			sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root handle 1: htb default 30
-			
-		 else
-		 	if [ $ONEWAYDELAY != "0" ]
-		 	 then
-		 		sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root netem delay ${ONEWAYDELAY}ms
-		 	fi
-		fi
-		
-		if [ "$DLSPEED" != "0" ]
-		 then		
-			
-			sudo tc class add dev vethreal${c} parent 1: classid 1:1 htb rate ${DLSPEED}kbit
-			sudo tc filter add dev vethreal${c} protocol ip parent 1:0 prio 1 u32 match ip dst ${virtualip}/32 flowid 1:1
-			
-		fi
-		
-		if [ "$ULSPEED" != "0" ]
-		 then
-                	sudo ip netns exec blue${c} tc class add dev vethvirtual${c} parent 1: classid 1:2 htb rate ${ULSPEED}kbit
-                	sudo ip netns exec blue${c} tc filter add dev vethvirtual${c} protocol ip parent 1:0 prio 1 u32 match ip src ${virtualip}/32 flowid 1:2
-		fi
+		#Uplink
 		
 		if [ "$ONEWAYDELAY" != "0" ]
- 		 then
- 		 	if  [ "$DLSPEED" != "0" ]
- 		 	 then
-				sudo tc qdisc add dev vethreal${c} parent 1:1 handle 11 netem delay ${ONEWAYDELAY}ms
-			 else
-			 	if [ "$ULSPEED" != "0" ]
-			 	 then
-			 	 	sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} parent 1:2 handle 12 netem delay ${ONEWAYDELAY}ms
-			 	 	
-			 	fi
-			fi
+                 then
+                        sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root handle 1: netem delay ${ONEWAYDELAY}ms
+                        
+                        if [ "$ULSPEED" != "0" ]
+                         then
+                                sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} parent 1: cake bandwidth ${ULSPEED}kbit besteffort
+                        fi
+                        
+                 else
+                 	  
+                	if [ "$ULSPEED" != "0" ]
+                 	 then
+                        	sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root cake bandwidth ${ULSPEED}kbit besteffort
+                	fi
+                fi
+                
+		
+		#Downlink 	
 			
-		fi
+		sudo ip netns exec blue${c} ip link add name ifb${c} type ifb
+		sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} handle ffff: ingress
 		
 		
+		if [ "$ONEWAYDELAY" != "0" ]
+                 then
+                	sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root handle 2: netem delay ${ONEWAYDELAY}ms	
+                
+                	if [ "$DLSPEED" != "0" ]
+                         then
+                                sudo ip netns exec blue${c} tc qdisc add dev ifb${c} parent 2: cake bandwidth ${DLSPEED}kbit besteffort 
+                        fi
+                 else
+                 	
+                 	if [ "$DLSPEED" != "0" ]
+                  	 then	
+				sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root cake bandwidth ${DLSPEED}kbit besteffort
+			fi
+		fi 	
+		
+		sudo ip netns exec blue${c} ip link set ifb${c} up # if you don't bring the device up your connection will lock up on the next step.
+		sudo ip netns exec blue${c} tc filter add dev vethvirtual${c} parent ffff: matchall action mirred egress redirect dev ifb${c}
+		
+				
 		#Add static route from host towards the virtual device
 		
 		sudo route add -net ${network} netmask 255.255.255.0 gw ${realip} dev vethreal${c}
 
-	
-		#sudo ip netns exec blue${c} ../../setupdbus.sh
 				
 		#Update counters for ip address generation
 

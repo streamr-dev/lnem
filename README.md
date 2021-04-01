@@ -39,7 +39,7 @@ from the namespace blueN, and the device vethrealN is visible from the host. The
 
 ## Prerequisites
 
-* A Linux host with root privilleges (use a dedicated virtual machine to stay safe)
+* A Linux host with a 5.x+ kernel and root privilleges  (use a dedicated virtual machine to stay safe)
 * The following Debian packages (or equivivalent):
 
 ```
@@ -56,13 +56,15 @@ sudo sysctl -p /etc/sysctl.conf
 
 [more info on how to make the ip forwarding change permanent](https://askubuntu.com/questions/311053/how-to-make-ip-forwarding-permanent)
 
-## Installing
+* You need a working nodejs and npm setup if you intend to install the scripts globally using npm. Alternatively you can directly execute the scripts from the bin folder 
+
+## Installing using npm
 
 ```
 sudo npm install -g @streamr/lnem
 ```
 
-## Uninstalling
+## Uninstalling using npm
 
 ```
 sudo npm uninstall -g @streamr/lnem
@@ -78,8 +80,8 @@ Install netperf
 sudo apt-get install netperf
 ```
 
-Create a network namespace for the netperf server with download bandwidth limit of 1000 kbit/s, upload bandwidth limit of 2000 kbit/s, and RTT latency 
-of 10 ms between the namespace and the host machine.
+Create a network namespace for the netperf server with download bandwidth limit of 1000 kbit/s, upload bandwidth limit of 2000 kbit/s, and
+one-way latency of 10 ms between the namespace and the host machine.
 
 ```
 sudo lnem-up --download 1000 --upload 2000 --latency 10 --num 1
@@ -101,7 +103,7 @@ sudo ip netns exec blue2 ping 10.240.1.2
 Start the netperf server in the blue1 namespace
 
 ```
-sudo ip netns exec blue1 netserver  &
+sudo ip netns exec blue1 netserver -4 &
 ```
 
 
@@ -109,7 +111,7 @@ Run the netperf client in the blue2 namespace, and instruct it to connect to the
 be close to 1 Mibit/s (the download bandwidth limit we set to the server's namespace)
 
 ```
-sudo ip netns exec blue2 netperf -H 10.240.1.2 
+sudo ip netns exec blue2 netperf -4 -H 10.240.1.2 
 ```
 
 To clean up, kill netperf server, and delete the two namespaces.
@@ -122,6 +124,6 @@ sudo lnem-down -n 2
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License.
 
 
