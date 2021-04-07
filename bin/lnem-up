@@ -60,6 +60,8 @@ echo "Upload to host bandwidth limit $ULSPEED kbit/s"
 echo "Download from host bandwidth limit $DLSPEED kbit/s"
 echo "One-way latency to/from host $ONEWAYDELAY ms"
 
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -p /etc/sysctl.conf
 
 smallcounter=1
 bigcounter=240
