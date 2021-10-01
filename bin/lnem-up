@@ -113,7 +113,7 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
 
 		if [ "$ONEWAYDELAY" != "0" ]
                  then
-                        sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root handle 1: netem delay ${ONEWAYDELAY}ms
+                        sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root handle 1: netem limit 100K delay ${ONEWAYDELAY}ms
 
                         if [ "$ULSPEED" != "0" ]
                          then
@@ -137,7 +137,7 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
 
 		if [ "$ONEWAYDELAY" != "0" ]
                  then
-                	sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root handle 2: netem delay ${ONEWAYDELAY}ms
+                	sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root handle 2: netem limit 100K delay ${ONEWAYDELAY}ms
 
                 	if [ "$DLSPEED" != "0" ]
                          then
