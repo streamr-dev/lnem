@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# This Linux script creates NUM_INTERFACES inter-networked virtual ethernet devices 
+# This Linux script creates NUM_INTERFACES inter-networked virtual ethernet devices
 # with upload bandwidth and download bandwidth capped with tc to ULSPEED and DLSPEED,
 # respectively. The virtual devices are named in the format vethrealX and vethvirtualX
-# where X is the interface number. Each virtual device vethvirtualX is palaced in 
-# its own network namespace blueX. 
+# where X is the interface number. Each virtual device vethvirtualX is palaced in
+# its own network namespace blueX.
 # The virtual ethernet devices have IP addresses in the format 10.x.y.1 for vethrealX
-# and and 10.x.y.2 for the vethvirtualX. 
+# and and 10.x.y.2 for the vethvirtualX.
 
 
 NUM_INTERFACES=2
-ULSPEED=0 
+ULSPEED=0
 DLSPEED=0
 ONEWAYDELAY=0
 FIRST_INTERFACE=1
@@ -76,15 +76,15 @@ for (( k=1; k<${FIRST_INTERFACE}; k++ ))
                 if [ $smallcounter -eq 252 ]
                 then
                         smallcounter=1
-                        bigcounter=$(($bigcounter + 1)) 
+                        bigcounter=$(($bigcounter + 1))
                 fi
 	done
 
 
 
 for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
-	do	
-		realip=10.${bigcounter}.${smallcounter}.1		
+	do
+		realip=10.${bigcounter}.${smallcounter}.1
 		virtualip=10.${bigcounter}.${smallcounter}.2
 		network=10.${bigcounter}.${smallcounter}.0
 
@@ -92,74 +92,77 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
 		sudo ip link add vethreal${c} type veth peer name vethvirtual${c}
 		sudo ifconfig vethreal${c} ${realip} netmask 255.255.255.0 up
 
-		# Create blueX network namespace for the client 
-		sudo ip netns add blue${c}	
-		
+		# Create blueX network namespace for the client
+		sudo ip netns add blue${c}
+
 		#Assign the even end of the virtual ethernet to the namespace
 		sudo ip link set vethvirtual${c} netns blue${c}
 
 		#Give ip address to vethvirtualX and bring it up
-		 
-		sudo ip netns exec blue${c} ip link set dev lo up		
-		sudo ip netns exec blue${c} ifconfig vethvirtual${c} ${virtualip} netmask 255.255.255.0 up 
-		
+
+		sudo ip netns exec blue${c} ip link set dev lo up
+		sudo ip netns exec blue${c} ifconfig vethvirtual${c} ${virtualip} netmask 255.255.255.0 up
+
 		#set default route for the virtual ethernet so eth0 can be found
-		
-		sudo ip netns exec blue${c} route add default gw ${realip} 
+
+		sudo ip netns exec blue${c} route add default gw ${realip}
 
 		#Set upload and download limits to vethvirtualX
 
 		#Uplink
-		
+
 		if [ "$ONEWAYDELAY" != "0" ]
                  then
                         sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root handle 1: netem delay ${ONEWAYDELAY}ms
-                        
+
                         if [ "$ULSPEED" != "0" ]
                          then
                                 sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} parent 1: cake bandwidth ${ULSPEED}kbit besteffort
                         fi
-                        
+
                  else
-                 	  
+
                 	if [ "$ULSPEED" != "0" ]
                  	 then
                         	sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} root cake bandwidth ${ULSPEED}kbit besteffort
                 	fi
                 fi
-                
-		
-		#Downlink 	
-			
+
+
+		#Downlink
+
 		sudo ip netns exec blue${c} ip link add name ifb${c} type ifb
 		sudo ip netns exec blue${c} tc qdisc add dev vethvirtual${c} handle ffff: ingress
-		
-		
+
+
 		if [ "$ONEWAYDELAY" != "0" ]
                  then
-                	sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root handle 2: netem delay ${ONEWAYDELAY}ms	
-                
+                	sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root handle 2: netem delay ${ONEWAYDELAY}ms
+
                 	if [ "$DLSPEED" != "0" ]
                          then
-                                sudo ip netns exec blue${c} tc qdisc add dev ifb${c} parent 2: cake bandwidth ${DLSPEED}kbit besteffort 
+                                sudo ip netns exec blue${c} tc qdisc add dev ifb${c} parent 2: cake bandwidth ${DLSPEED}kbit besteffort
                         fi
                  else
-                 	
+
                  	if [ "$DLSPEED" != "0" ]
-                  	 then	
+                  	 then
 				sudo ip netns exec blue${c} tc qdisc add dev ifb${c} root cake bandwidth ${DLSPEED}kbit besteffort
 			fi
-		fi 	
-		
+		fi
+
 		sudo ip netns exec blue${c} ip link set ifb${c} up # if you don't bring the device up your connection will lock up on the next step.
 		sudo ip netns exec blue${c} tc filter add dev vethvirtual${c} parent ffff: matchall action mirred egress redirect dev ifb${c}
-		
-				
+
+
 		#Add static route from host towards the virtual device
-		
+
 		sudo route add -net ${network} netmask 255.255.255.0 gw ${realip} dev vethreal${c}
 
-				
+                #Allow forwarding from virtual device
+
+                sudo iptables -A FORWARD -i vethreal${c} -j ACCEPT
+
 		#Update counters for ip address generation
 
 		smallcounter=$(($smallcounter + 1))
@@ -167,8 +170,8 @@ for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
 		if [ $smallcounter -eq 252 ]
 		then
 			smallcounter=1
-			bigcounter=$(($bigcounter + 1)) 
+			bigcounter=$(($bigcounter + 1))
 		fi
-			
+
 	done
 sleep 2

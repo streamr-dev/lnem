@@ -33,12 +33,13 @@ echo "Deleting $NUM_INTERFACES network namespaces blue$FIRST_INTERFACE...blue$LA
 NUM_INTERFACES=$(($NUM_INTERFACES+1))
 
 for (( c=${FIRST_INTERFACE}; c<=${LAST_INTERFACE}; c++ ))
-	do			
+	do
 		#Delete the virtual ethernet device
-		sudo ip netns exec blue${c} tc qdisc del dev vethvirtual${c} root > /dev/null 2>&1		
+		sudo iptables -D FORWARD -i vethreal${c} -j ACCEPT
+		sudo ip netns exec blue${c} tc qdisc del dev vethvirtual${c} root > /dev/null 2>&1
 		sudo ip link del vethreal${c}
-		sudo ip netns del blue${c}	 
-		
+		sudo ip netns del blue${c}
+
 	done
 
 
